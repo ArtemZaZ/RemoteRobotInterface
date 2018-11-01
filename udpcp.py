@@ -12,7 +12,7 @@ UDP Control Protocol - UDP Протокол управления
     :field args(var): поле параметров ф-ии(следуют друг за другом)
 """
 
-_protocolHeadConfig = {
+protocolHeadConfig = {
     "start": b'\xAA\xAA',   # стартовые байты
     "formatPackageLen": 'i',  # 4 байта
     "formatPackageNum": 'i',  # 4 байта
@@ -20,11 +20,11 @@ _protocolHeadConfig = {
     "checksum": "crc16"      # хеш сумма crc16
 }
 
-_headFormat = _protocolHeadConfig["formatPackageLen"]\
-            + _protocolHeadConfig["formatPackageNum"]\
-            + _protocolHeadConfig["formatChecksum"]
+_headFormat = protocolHeadConfig["formatPackageLen"] \
+              + protocolHeadConfig["formatPackageNum"] \
+              + protocolHeadConfig["formatChecksum"]
 
-_headSize = len(_protocolHeadConfig["start"]) + struct.calcsize(_headFormat)
+_headSize = len(protocolHeadConfig["start"]) + struct.calcsize(_headFormat)
 
 
 def pack(packageNumber, functionName, *args):
@@ -32,20 +32,20 @@ def pack(packageNumber, functionName, *args):
     data = pickle.dumps((functionName, *args), 3)   # сами данные
     packageLen = len(data) + _headSize  # суммарная длина пакета
     checksum = crc16.crc16xmodem(data)  # контрольная сумма
-    head = _protocolHeadConfig["start"] + struct.pack(_headFormat, packageLen, checksum, packageNumber)     # заголовок
+    head = protocolHeadConfig["start"] + struct.pack(_headFormat, packageLen, checksum, packageNumber)     # заголовок
     return head + data
 
 
 def unpack(package):
     """ Распаковка пакета UDPCP """
-    head = struct.unpack(_headFormat, package[len(_protocolHeadConfig["start"]):_headSize])     # кортеж заголовка
+    head = struct.unpack(_headFormat, package[len(protocolHeadConfig["start"]):_headSize])     # кортеж заголовка
     data = package[_headSize:]  # сырые данные
     return (*head, *(pickle.loads(data)))   # распаковываем кортежи и запаковываем в кортеж
 
 
 def check(package):
     """ Проверка контрольной суммы """
-    _, checksum, _ = struct.unpack(_headFormat, package[len(_protocolHeadConfig["start"]):_headSize])   # получаем
+    _, checksum, _ = struct.unpack(_headFormat, package[len(protocolHeadConfig["start"]):_headSize])   # получаем
     #  контрольную сумму
     data = package[_headSize:]  # сырые данные
     hesh = crc16.crc16xmodem(data)  # считаем контрольную сумму
@@ -53,7 +53,7 @@ def check(package):
 
 
 if __name__ == "__main__":
-    package = pack(10, "move", "ifc", 0, 16)
+    package = pack(10, "move", 0, 16)
     if check(package):
         data = unpack(package)
         print(data)
