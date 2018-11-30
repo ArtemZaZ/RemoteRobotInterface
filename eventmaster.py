@@ -3,6 +3,12 @@
 import threading
 import queue
 
+# TODO: Переписать основной модуль под этот.
+
+class EventError(Exception):
+    """ исключение события """
+    pass
+
 
 class Event:
     """ Класс представляющий событие """
@@ -23,7 +29,7 @@ class Event:
         """ Вызов события """
         self._foo = lambda: self.__f(*args)     # оборачиваем вызов ф-ии с параметрами в пустую ф-ию
         if self._eventMaster:
-            self._eventMaster.pull(self)
+            self._eventMaster.pull(self._foo)
 
     def _attachEventMaster(self, eventMaster):
         """ Устанавливает ссылку на мастер событий """
@@ -50,7 +56,7 @@ class EventMaster(threading.Thread):
 
     def run(self):  # функция потока EM
         while not self.__exit:  # пока нет метки выхода из потока
-            threading.Thread(daemon=True, target=self._eventQueue.get().handler).start()    # вызов обработчика события
+            threading.Thread(daemon=True, target=self._eventQueue.get()).start()    # вызов обработчика события
             # в отдельном потоке с блокированием цикла
 
     def exit(self):
@@ -67,9 +73,9 @@ class EventMaster(threading.Thread):
         else:
             raise TypeError("parameter must be a Event")
 
-    def pull(self, event):
+    def pull(self, handler):
         """ перетащить событие в очередь на выполнение обработчика """
-        if isinstance(event, Event):    # тип должен быть Event
-            self._eventQueue.put(event)     # поставить событие в очередь на выполнение обработчиков
+        if callable(handler):    # тип должен быть ф-ией
+            self._eventQueue.put(handler)     # поставить событие в очередь на выполнение обработчиков
         else:
-            raise TypeError("parameter must be a Event")
+            raise TypeError("parameter must be a callable")

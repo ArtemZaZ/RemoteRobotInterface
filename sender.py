@@ -6,7 +6,7 @@ import queue
 class Sender(threading.Thread):
     """ класс, отправляющий пакеты """
     def __init__(self, **kwargs):
-        threading.Thread.__init__(self, daemon=True, **kwargs)
+        threading.Thread.__init__(self, daemon=True)
         self._sock = socket.socket(**kwargs)
         self._queue = queue.Queue()     # очередь пакетов
         self._host = None   # (ip, port)
