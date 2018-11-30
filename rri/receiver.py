@@ -1,8 +1,7 @@
 import socket
 import threading
 import struct
-import eventmaster
-import udpcp
+from rri import eventmaster, udpcp
 
 
 class Receiver(threading.Thread):

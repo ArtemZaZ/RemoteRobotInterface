@@ -1,8 +1,6 @@
 import socket
 
-import sender
-import receiver
-import udpcp
+from rri import receiver, sender, udpcp
 import time
 
 rec = receiver.UdpcpReceiver()

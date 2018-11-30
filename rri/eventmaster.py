@@ -5,6 +5,7 @@ import queue
 
 # TODO: Переписать основной модуль под этот.
 
+
 class EventError(Exception):
     """ исключение события """
     pass
