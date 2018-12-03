@@ -23,7 +23,7 @@ _headFormat = protocolHeadConfig["formatPackageNum"] \
 _headSize = struct.calcsize(_headFormat)
 
 
-def pack(packageNumber, functionName, *args):
+def pack(functionName, packageNumber, *args):
     """ Упаковка пакета данных в пакет UDPCP """
     data = pickle.dumps((functionName, *args), 3)   # сами данные
     packageLen = len(data) + _headSize  # суммарная длина пакета
